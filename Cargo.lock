@@ -5229,6 +5229,7 @@ dependencies = [
  "safe-path",
  "serde",
  "serde_json",
+ "tempfile",
 ]
 
 [[package]]
