@@ -173,6 +173,14 @@ impl ContainerManager for VirtContainerManager {
                 let c = containers
                     .remove(container_id)
                     .ok_or_else(|| Error::ContainerNotFound(container_id.to_string()))?;
+                // Returning an error here blocks containerd from processing the exit
+                // and reaching sandbox teardown, so report the cleanup failure and continue.
+                if let Err(e) = c.finish_cleanup().await {
+                    error!(
+                        sl!(),
+                        "failed to finish cleanup of container {}: {:?}", container_id, e
+                    );
+                }
 
                 // Poststop Hooks:
                 // * should be run in runtime namespace
